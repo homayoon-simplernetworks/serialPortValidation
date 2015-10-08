@@ -49,6 +49,7 @@ def serialLogin():
 # to find out session of serial connection, if it was logged in initially     
 def whereAmI():
     knownPage = False
+    curentPage = 'unKnown'
     while not knownPage:
         li = ser.readline()
         if li ==b'' : ser.write(b'\r')
@@ -59,11 +60,22 @@ def whereAmI():
                     knownPage = True
                     curentPage = item
                     print (item)
+    return curentPage
 
 # to logout (please notice that code is intelligent enough to logout from any pages    
 def logoutPlease():
+    dCurentPage =  whereAmI()
+    def notlogin():
+        exx = input ('you are log out press enter to exit ...')
+        str.close()
+        exit()
 
-    pass
+    try :
+        eval(dCurentPage)()
+    except  Exception as err:
+        print('the (' + dCurentPage +') item in serialStructure.yaml file is not implemented in code. program will act as unknown page ' , err) 
+        curentPage = 'unknown'
+    
 
 
 
@@ -74,7 +86,9 @@ if __name__ == "__main__":
     print (
 '''
 ************************************************************************
-********************Serial port auto tester*****************************
+*            Simpler Networks system test automation                   *
+*                    Serial port auto tester                           *
+************************************************************************
 
 this program will log in into ez-edge automatically to test serial port
           this test may change settings on your system
@@ -90,7 +104,7 @@ this program will log in into ez-edge automatically to test serial port
 
     #Parameters
     
-    global curentPage
+    
 
     # load parameters from yaml files
 
@@ -144,7 +158,7 @@ this program will log in into ez-edge automatically to test serial port
         exit()
 
     # to find out session of serial connection, if it was logged in initially     
-    whereAmI()
+    logoutPlease()
 
     
     

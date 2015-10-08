@@ -34,3 +34,6 @@ reset :
 changePass : 
   idf: 'EZ-EDGE Local Craft Interface - Change Local Craft Interface Password'
   code : '89'
+unknown : 
+  idf: ' could be any things ......' 
+  code : '88'
