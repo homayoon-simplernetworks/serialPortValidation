@@ -1,0 +1,6 @@
+port : 'COM3'              #Port should be the exact name as system port
+baudrate : 9600            #ez-edge just support 9600
+parity : 'N'               #ez-edge just support 'N' (serial.PARITY_NONE)
+stopbits : 1               #ez-edge just support 'N' (serial.STOPBITS_ONE)
+bytesize : 8               #ez-edge just support 'N' (serial.EIGHTBITS)
+timeout : 0.5              #the best one is 0.5

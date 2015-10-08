@@ -1,0 +1,36 @@
+wait: 
+  idf: 'Too many invalid login'
+  code: '99'
+notlogin:
+  idf: 'NOTICE: This system is strictly'
+  code: '98'
+badLogin:
+  idf: 'Error: incorrect login'
+  code: '97'
+mainMenu :
+  idf : 'EZ-EDGE Local Craft Interface - Main Menu'
+  code : '96'
+setupMenu : 
+  idf : 'EZ-EDGE Local Craft Interface - Configuration Parameters' 
+  code : '95'
+sysconfig : 
+  idf : 'EZ-EDGE Local Craft Interface - System Configuration'
+  code: '94'
+nonDB : 
+  idf : 'Enter your selection []:'
+  code : '94'
+netConfig : 
+  idf : 'EZ-EDGE Local Craft Interface - Network Interface Configuration'
+  code : '93'
+timeConfig : 
+  idf : 'EZ-EDGE Local Craft Interface - Time and Date Configuration'
+  code : '92'
+displayAlarm : 
+  idf: 'EZ-EDGE Local Craft Interface - Current Alarms'
+  code : '91'
+reset : 
+  idf: 'EZ-EDGE Local Craft Interface - Restart'
+  code : '90'
+changePass : 
+  idf: 'EZ-EDGE Local Craft Interface - Change Local Craft Interface Password'
+  code : '89'

@@ -5,6 +5,7 @@ import serial
 import colorama
 import sys
 from pyparsing import *
+import yld
 
 
 #to login into ez-edge
@@ -45,13 +46,31 @@ def serialLogin():
         elif li.find('Press any key')>= 0: 
                 ser.write(b'\r')
             
-            
-        
+# to find out session of serial connection, if it was logged in initially     
+def whereAmI():
+    knownPage = False
+    while not knownPage:
+        li = ser.readline()
+        if li ==b'' : ser.write(b'\r')
+        else :
+            sli  = li.decode()
+            for item in serStrc :
+                if serStrc[item]['idf'] in sli : 
+                    knownPage = True
+                    curentPage = item
+                    print (item)
+
+# to logout (please notice that code is intelligent enough to logout from any pages    
+def logoutPlease():
+
+    pass
+
+
+
+     
 
 if __name__ == "__main__":
 
-
-    
     print (
 '''
 ************************************************************************
@@ -68,32 +87,64 @@ this program will log in into ez-edge automatically to test serial port
 
     if not input('please confirm you want run the test[y]: ') == 'y' : exit()
 
+
+    #Parameters
+    
+    global curentPage
+
+    # load parameters from yaml files
+
+    #load serial port variables 
+    fVariables = "variables.yaml"
+    yf = yld.yld
+    vars = yf.yaml_loader(fVariables)
+      
+    port= vars['port'].strip()
+    baudrate = vars['baudrate']
+    parity =  vars['parity']      #serial.PARITY_NONE
+    stopbits = vars['stopbits']   #serial.STOPBITS_ONE
+    bytesize = vars['bytesize']     #serial.EIGHTBITS
+    timeout = vars['timeout']
+
+
+    #load ez-edge LCI structure
+    fStructure = 'serialStructure.yaml'
+    global serStrc
+    serStrc  = yf.yaml_loader(fStructure)
     
 
 
-    # configure the serial connections (the parameters differs on the device you are connecting to)
-    port='COM3'
-    try:
-        ser = serial.Serial(port,
-            baudrate=9600,
-            parity=serial.PARITY_NONE,
-            stopbits=serial.STOPBITS_ONE,
-            bytesize=serial.EIGHTBITS,
-            timeout = 1 )
-
-        if not ser.isOpen(): ser.open()
-
-    except :
-        print (port + '  is not ready please check the port and try again')
-        rr = input('press enter to exit ...')
-        exit()
-
-        
     # this part of program will remove the ESC ansi codes from strings 
     ESC = Literal('\x1b')
     integer = Word(nums)
     escapeSeq = Combine(ESC + '[' + Optional(delimitedList(integer,';')) + oneOf(list(alphas)))
     nonAnsiString = lambda s : Suppress(escapeSeq).transformString(s)
+
+    # opening the serial port 
+    try:
+        ser = serial.Serial(port,
+            baudrate,
+            bytesize,
+            parity ,
+            stopbits ,            
+            timeout )
+        
+
+        if not ser.isOpen(): ser.open()
+
+    except  ValueError as err :
+        print(" please check and modify variables.yaml : {0}".format(err))
+        
+        rr = input('press enter to exit ...')
+        exit()
+
+    except   :
+        print (port + '  is not ready please check the port and try again  ' )
+        rr = input('press enter to exit ...')
+        exit()
+
+    # to find out session of serial connection, if it was logged in initially     
+    whereAmI()
 
     
     

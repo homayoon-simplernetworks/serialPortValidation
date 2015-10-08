@@ -22,7 +22,16 @@
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="ordered.py" />
     <Compile Include="serialPortValidation.py" />
+    <Compile Include="setup.py" />
+    <Compile Include="yld.py" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="serialStructure.yaml" />
+    <Content Include="variables.yaml">
+      <SubType>Code</SubType>
+    </Content>
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
