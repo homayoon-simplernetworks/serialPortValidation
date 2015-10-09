@@ -47,9 +47,10 @@ def serialLogin():
                 ser.write(b'\r')
             
 # to find out session of serial connection, if it was logged in initially     
-def whereAmI():
+def whereAmI(toWrite):
     knownPage = False
-    curentPage = 'unKnown'
+    currentPage = 'unKnown'
+    if not toWrite=='' :  ser.write(toWrite.encode('ascii' , 'replace'))
     while not knownPage:
         li = ser.readline()
         if li ==b'' : ser.write(b'\r')
@@ -58,23 +59,65 @@ def whereAmI():
             for item in serStrc :
                 if serStrc[item]['idf'] in sli : 
                     knownPage = True
-                    curentPage = item
+                    currentPage = item
                     print (item)
-    return curentPage
+    return currentPage
 
 # to logout (please notice that code is intelligent enough to logout from any pages    
-def logoutPlease():
-    dCurentPage =  whereAmI()
-    def notlogin():
-        exx = input ('you are log out press enter to exit ...')
-        str.close()
-        exit()
+def logoutPlease(dcurrentPage , action , mssg):
 
+    # depends on the current page we need different action to logout, each def will provide steps to logout from each page, in future if we add new 
+    # pages to LCI, new def should be added here as well as in serialStructure.yaml file
+    def notloginLogout():
+        if action == 'exit' : 
+            exx = input ('you are log out press enter to exit ...')
+            str.close()
+            exit()
+    def waitLogout():
+        if action == 'exit' : 
+            exx = input ('you are log out press enter to exit ...')
+            str.close()
+            exit()
+
+        print ('you are log out but because of too many invalid login you need to wait 1 min to be able to reconnect to system (wait please ...)')
+        for i in range(1,60):
+            print('*' , end = '')
+            time.sleep(1)
+
+    def badLoginLogout(): 
+        if action == 'exit' : 
+            exx = input ('you are log out press enter to exit ...')
+            str.close()
+            exit()
+
+    def returnLogout(rreturnCode):
+        ifany = ser.readlines() #to make sure LCI finished sending and it is ready to receive new command
+        ser.write(rreturnCode.encode('ascii' , 'replace'))
+        rr = ser.read(1)
+        time.sleep(0.15)
+        #ser.write(b'\r')
+        logoutPlease('anywhere' , action , '\r')
+        
+
+    
     try :
-        eval(dCurentPage)()
+        #anywhere is used for mention that program does not know or could not be sure where is it in LCI
+        if dcurrentPage == 'anywhere' : dcurrentPage =  whereAmI(mssg)
+
+        returnCode = serStrc[dcurrentPage]['returnCode']
+        #if we use pass of the day debug menu will be added to menu, therefore we need to add 1 to return code
+        if passOfDay and dcurrentPage == 'mainMenu' : returnCode = returnCode + 1
+        if  returnCode<400 : 
+            returnLogout(str(returnCode))
+            return
+        elif returnCode<500 : 
+            logoutPlease('anywhere' , action , '\r')
+            return
+        
+        eval(dcurrentPage + 'Logout')()
     except  Exception as err:
-        print('the (' + dCurentPage +') item in serialStructure.yaml file is not implemented in code. program will act as unknown page ' , err) 
-        curentPage = 'unknown'
+        print('the (' + dcurrentPage +') item in serialStructure.yaml file is not implemented in code. program will act as unknown page ' , err) 
+        currentPage = 'unknown'
     
 
 
@@ -104,7 +147,8 @@ this program will log in into ez-edge automatically to test serial port
 
     #Parameters
     
-    
+    global passOfDay
+    passOfDay = False
 
     # load parameters from yaml files
 
@@ -125,7 +169,7 @@ this program will log in into ez-edge automatically to test serial port
     fStructure = 'serialStructure.yaml'
     global serStrc
     serStrc  = yf.yaml_loader(fStructure)
-    
+    #for ite in serStrc : print (serStrc[ite])
 
 
     # this part of program will remove the ESC ansi codes from strings 
@@ -158,7 +202,7 @@ this program will log in into ez-edge automatically to test serial port
         exit()
 
     # to find out session of serial connection, if it was logged in initially     
-    logoutPlease()
+    logoutPlease('anywhere' , 'continue' , '')
 
     
     

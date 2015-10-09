@@ -1,39 +1,42 @@
+#this items here should be exact same as def in python program if you add nee item ( new page in serial port) you should add def to python
+# code in below is return code, if page does not have return code put something unic
+
 wait: 
   idf: 'Too many invalid login'
-  code: '99'
+  returnCode: 1001
 notlogin:
   idf: 'NOTICE: This system is strictly'
-  code: '98'
+  returnCode: 1002
 badLogin:
   idf: 'Error: incorrect login'
-  code: '97'
+  returnCode: 1003
 mainMenu :
   idf : 'EZ-EDGE Local Craft Interface - Main Menu'
-  code : '96'
+  returnCode : 5
 setupMenu : 
   idf : 'EZ-EDGE Local Craft Interface - Configuration Parameters' 
-  code : '95'
+  returnCode : 4
 sysconfig : 
   idf : 'EZ-EDGE Local Craft Interface - System Configuration'
-  code: '94'
+  returnCode: 401
 nonDB : 
   idf : 'Enter your selection []:'
-  code : '94'
+  returnCode : 402
 netConfig : 
   idf : 'EZ-EDGE Local Craft Interface - Network Interface Configuration'
-  code : '93'
+  returnCode : 403
 timeConfig : 
   idf : 'EZ-EDGE Local Craft Interface - Time and Date Configuration'
-  code : '92'
+  returnCode : 404
 displayAlarm : 
   idf: 'EZ-EDGE Local Craft Interface - Current Alarms'
-  code : '91'
+  returnCode : 405
 reset : 
   idf: 'EZ-EDGE Local Craft Interface - Restart'
-  code : '90'
+  returnCode : 406
 changePass : 
   idf: 'EZ-EDGE Local Craft Interface - Change Local Craft Interface Password'
-  code : '89'
+  returnCode : 407
 unknown : 
   idf: ' could be any things ......' 
-  code : '88'
+  returnCode : 1004
