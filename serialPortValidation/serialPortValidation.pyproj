@@ -29,7 +29,7 @@
     <Compile Include="yld.py" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="serialCofigurationTest.yaml" />
+    <Content Include="serialConfigurationTest.yaml" />
     <Content Include="serialStructure.yaml" />
     <Content Include="variables.yaml">
       <SubType>Code</SubType>

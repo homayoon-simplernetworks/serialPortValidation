@@ -6,6 +6,7 @@ import colorama
 import sys
 from pyparsing import *
 import yld
+import orderedYld
 
 
 #to login into ez-edge
@@ -64,31 +65,21 @@ def whereAmI(toWrite):
     return currentPage
 
 # to logout (please notice that code is intelligent enough to logout from any pages    
-def logoutPlease(dcurrentPage , action , mssg):
+def gotoPageBackward(dcurrentPage , toPage , mssg):
 
     # depends on the current page we need different action to logout, each def will provide steps to logout from each page, in future if we add new 
     # pages to LCI, new def should be added here as well as in serialStructure.yaml file
     def notloginLogout():
-        if action == 'exit' : 
-            exx = input ('you are log out press enter to exit ...')
-            str.close()
-            exit()
+        return dcurrentPage
     def waitLogout():
-        if action == 'exit' : 
-            exx = input ('you are log out press enter to exit ...')
-            str.close()
-            exit()
-
         print ('you are log out but because of too many invalid login you need to wait 1 min to be able to reconnect to system (wait please ...)')
         for i in range(1,60):
             print('*' , end = '')
             time.sleep(1)
+        return 'notlogin'
 
     def badLoginLogout(): 
-        if action == 'exit' : 
-            exx = input ('you are log out press enter to exit ...')
-            str.close()
-            exit()
+        return 'notlogin'
 
     def returnLogout(rreturnCode):
         ifany = ser.readlines() #to make sure LCI finished sending and it is ready to receive new command
@@ -96,7 +87,7 @@ def logoutPlease(dcurrentPage , action , mssg):
         rr = ser.read(1)
         time.sleep(0.15)
         #ser.write(b'\r')
-        logoutPlease('anywhere' , action , '\r')
+        gotoPageBackward('anywhere' , toPage , '\r')
         
 
     
@@ -107,18 +98,30 @@ def logoutPlease(dcurrentPage , action , mssg):
         returnCode = serStrc[dcurrentPage]['returnCode']
         #if we use pass of the day debug menu will be added to menu, therefore we need to add 1 to return code
         if passOfDay and dcurrentPage == 'mainMenu' : returnCode = returnCode + 1
+
+        #this line will check if we are in requested page or not
+        if toPage == dcurrentPage : return dcurrentPage
+        elif dcurrentPage == 'mainMenu' and  not toPage=='exit':  #and condition is extra, has been added for readability of code
+            return dcurrentPage
+
         if  returnCode<400 : 
             returnLogout(str(returnCode))
             return
         elif returnCode<500 : 
-            logoutPlease('anywhere' , action , '\r')
+            gotoPageBackward('anywhere' , toPage , '\r')
             return
         
         eval(dcurrentPage + 'Logout')()
     except  Exception as err:
         print('the (' + dcurrentPage +') item in serialStructure.yaml file is not implemented in code. program will act as unknown page ' , err) 
         currentPage = 'unknown'
-    
+ 
+        
+
+           
+# to configuration test 
+def confTest():
+    pass
 
 
 
@@ -166,10 +169,17 @@ this program will log in into ez-edge automatically to test serial port
 
 
     #load ez-edge LCI structure
-    fStructure = 'serialStructure.yaml'
+    fStructure = vars['fStructure']
     global serStrc
     serStrc  = yf.yaml_loader(fStructure)
-    #for ite in serStrc : print (serStrc[ite])
+    
+
+    #Load test structure from serialconfigurationTest.yaml
+    oyf = orderedYld.orderedYld
+    fserconfStrc = vars['fserconfStrc']
+    serConfStrc = oyf.orderedYaml_loader(fserconfStrc)
+    
+
 
 
     # this part of program will remove the ESC ansi codes from strings 
@@ -202,10 +212,9 @@ this program will log in into ez-edge automatically to test serial port
         exit()
 
     # to find out session of serial connection, if it was logged in initially     
-    logoutPlease('anywhere' , 'continue' , '')
+    gotoPageBackward('anywhere' , 'wtert' , '')
 
-    
-    
+
     #login to ez-edge
     serialLogin()
             

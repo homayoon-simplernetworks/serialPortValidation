@@ -18,7 +18,7 @@
               'N' : 'EZ-EDGE Local Craft Interface - Configuration Parameters'
               'Y' : 'Changes applied successfully. Press any key to continue'
               'd' : 'Please confirm you want to proceed with the new configuration [N]:'
-              'enter' : 'EZ-EDGE Local Craft Interface - Configuration Parameters'			  
+              'enter' : 'EZ-EDGE Local Craft Interface - Configuration Parameters'
     2 : 
         expectedPage : 'netConfig'
         PageOptions : '0'
@@ -38,7 +38,7 @@
             step4 : 
               'N' : 'EZ-EDGE Local Craft Interface - Configuration Parameters'
               'Y' : 'Changes applied successfully. Press any key to continue'
-              'd' : 'Pleasen confirm you want to proceed with the new configuration [N]:'
+              'd' : 'Please confirm you want to proceed with the new configuration [N]:'
               'enter' : 'EZ-EDGE Local Craft Interface - Configuration Parameters'
     3 : 
         expectedPage : 'timeConfig'
@@ -49,11 +49,11 @@
               'wrongValue' : '2054-23-28'
               'enter' : 'Current UTC Time (HH:MM:SS)  ['
             step2 :
-              '12:10:09' : Please confirm you want to proceed with the new configuration [N]:
+              '12:10:09' : Please confirm you want to proceed with the new configuration [N]:'
               'wrongValue' : '28:15:12'
-              'enter' : Please confirm you want to proceed with the new configuration [N]:
+              'enter' : Please confirm you want to proceed with the new configuration [N]:'
             step3 : 
               'N' : 'EZ-EDGE Local Craft Interface - Configuration Parameters'
               'Y' : 'Changes applied successfully. Press any key to continue'
-              'd' : 'Pleasen confirm you want to proceed with the new configuration [N]:'
+              'd' : 'Please confirm you want to proceed with the new configuration [N]:'
               'enter' : 'EZ-EDGE Local Craft Interface - Configuration Parameters'
