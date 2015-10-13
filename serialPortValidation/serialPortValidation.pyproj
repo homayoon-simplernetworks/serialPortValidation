@@ -23,11 +23,13 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="ordered.py" />
+    <Compile Include="orderedYld.py" />
     <Compile Include="serialPortValidation.py" />
     <Compile Include="setup.py" />
     <Compile Include="yld.py" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="serialCofigurationTest.yaml" />
     <Content Include="serialStructure.yaml" />
     <Content Include="variables.yaml">
       <SubType>Code</SubType>

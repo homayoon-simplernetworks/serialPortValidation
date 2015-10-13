@@ -19,7 +19,7 @@ setupMenu :
 sysconfig : 
   idf : 'EZ-EDGE Local Craft Interface - System Configuration'
   returnCode: 401
-nonDB : 
+sysconfigNoDB : 
   idf : 'Enter your selection []:'
   returnCode : 402
 netConfig : 
