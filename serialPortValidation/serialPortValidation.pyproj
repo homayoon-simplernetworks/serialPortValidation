@@ -22,6 +22,9 @@
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="fortest.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="ordered.py" />
     <Compile Include="orderedYld.py" />
     <Compile Include="serialPortValidation.py" />
@@ -30,6 +33,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="serialConfigurationTest.yaml" />
+    <Content Include="serialConfigurationTest2.yaml" />
     <Content Include="serialStructure.yaml" />
     <Content Include="variables.yaml">
       <SubType>Code</SubType>

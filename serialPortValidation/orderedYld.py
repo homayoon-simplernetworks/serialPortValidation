@@ -22,4 +22,11 @@ class orderedYld(object):
                 with open(filepath, "w") as file_desxriptor:
                         #yaml.dump(data, file_desxriptor , default_flow_style=False)
                         oorw.ordered_dump(data, file_desxriptor ,  Dumper=yaml.SafeDumper , default_flow_style=False)
+
+    def orderedYmal_append(filepath, data):
+                """Dump data to a yaml file"""
+                oorw = ordered
+                with open(filepath, 'a') as file_desxriptor:
+                        #yaml.dump(data, file_desxriptor , default_flow_style=False)
+                        oorw.ordered_dump(data, file_desxriptor ,  Dumper=yaml.SafeDumper , default_flow_style=False)
     

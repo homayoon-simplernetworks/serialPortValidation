@@ -1,8 +1,15 @@
-port : 'COM3'              #Port should be the exact name as system port
-baudrate : 9600            #ez-edge just support 9600
-parity : 'N'               #ez-edge just support 'N' (serial.PARITY_NONE)
-stopbits : 1               #ez-edge just support 'N' (serial.STOPBITS_ONE)
-bytesize : 8               #ez-edge just support 'N' (serial.EIGHTBITS)
-timeout : 0.5              #the best one is 0.5
-fserconfStrc : 'serialConfigurationTest.yaml'  #this file will use as serial port configuration test references'
-fStructure : 'serialStructure.yaml' #load ez-edge LCI structure
+port : 'COM3'                                            #Port should be the exact name as system port
+baudrate : 9600                                          #ez-edge just support 9600
+parity : 'N'                                             #ez-edge just support 'N' (serial.PARITY_NONE)
+stopbits : 1                                             #ez-edge just support  (serial.STOPBITS_ONE)
+bytesize : 8                                             #ez-edge just support  (serial.EIGHTBITS)
+timeout : 0.5                                            #the best one is 0.5
+
+serialUser : 'admin'
+serialPass : 'ez-edge#1'
+
+
+fserconfStrc : 'serialConfigurationTest.yaml'            #this file will use as serial port configuration test references'
+fStructure : 'serialStructure.yaml'                      #load ez-edge LCI structure
+loggerPath: 'c:\\logs\\LCI_logs\\'                       #all logs will save there
+scriptFile: 'scriptFile.yaml'

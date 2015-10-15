@@ -1,6 +1,6 @@
 #configure system 
 1 :
-  expectPage  : 'setupMenu'
+  expectedPage  : 'setupMenu'
   PageOptions : 
     1 : 
         expectedPage : 'sysconfig'
@@ -36,7 +36,7 @@
               'wrongValue' : '333.128.3.3'
               'enter' : 'Please confirm you want to proceed with the new configuration [N]:'
             step4 : 
-              'N' : 'EZ-EDGE Local Craft Interface - Configuration Parameters'
+              'N' : 'Configuration Parameters'
               'Y' : 'Changes applied successfully. Press any key to continue'
               'd' : 'Please confirm you want to proceed with the new configuration [N]:'
               'enter' : 'EZ-EDGE Local Craft Interface - Configuration Parameters'

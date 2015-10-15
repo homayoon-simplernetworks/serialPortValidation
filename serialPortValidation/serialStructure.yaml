@@ -1,7 +1,9 @@
-#this items here should be exact same as def in python program if you add nee item ( new page in serial port) you should add def to python
-# code in below is return code, if page does not have return code put something unic
+# this file lists conditions and their prompts
+# each unique prompt allows the program to find where we are exactly in the menu structure
+# if a prompt is unrecognized, add a prompt and a returnCode for it at the end and treat it in the program
 
-wait: 
+
+wait:                                    # serial port is blocked and should wait 1 min
   idf: 'Too many invalid login'
   returnCode: 1001
 notlogin:

@@ -8,6 +8,20 @@ from pyparsing import *
 import yld
 import orderedYld
 
+ 
+# prepare time for logger
+def timestamp():
+    return time.strftime("%Y-%m-%d_%H-%M-%S", time.localtime()) 
+
+def remTerminalEsc (line):
+    readableString = nonAnsiString(line)
+    nnn = ['1 -' , '2 -' , '3 -' , '4 -' , '5 -' , '6 -', '7 -' , '8 -']
+    for nn in nnn: readableString = readableString.replace( nn , ' \n' + nn )
+    return  readableString
+
+def testScriptLoader(scriptFile):
+    pass
+
 
 #to login into ez-edge
 def serialLogin():
@@ -46,6 +60,113 @@ def serialLogin():
             ser.write(b'\r')
         elif li.find('Press any key')>= 0: 
                 ser.write(b'\r')
+
+def serialLoginTest(sUser, sPass ,testType, logfilepath):
+    global isLoginTest
+    isLoginTest = False
+    logger = []
+
+    #firs logout from anywhere and prepare system for login test
+    cPage = gotoPageBackward('anywhere' , 'exit' , '') 
+
+    logger.append(timestamp() +' Login test has been start by sending user <<'+ sUser + '>>  pass <<'+ sPass +'>> and test type is ' + testType )
+    print (logger)
+    ser.write(b'\r')
+    while not isLoginTest:
+        line = ser.readline()
+        li = line.decode()
+        while li == '' : 
+            time.sleep(0.5)
+            ser.write(b'\r')
+            line = ser.readline()
+            li = line.decode()
+
+        rli = remTerminalEsc(li)
+        logger.append( timestamp()+ ' *** ' + rli)
+        print (rli)
+
+        # check if Too many invalid login
+        if li.find('Too many invalid login')>0 : 
+            print (li , 'please wait')
+            for i in range(1,60):
+                print('&&' , end = '')
+                time.sleep(1)
+
+
+        #check if asking for user:
+        if li.find('User:')>= 0: 
+                for l in sUser:
+                    ser.write(l.encode('ascii'))
+                    bLr = ser.read(1)
+                    logger.append( bLr.decode())
+                    if not bLr== l.encode('ascii'): 
+                        testResault = 'failed'
+                        print ('test has failed, in user file, program expected: ' + l + 'but ez-edge sends: ' + bLr.decode())
+                        logger.append( timestamp() + ' *** ' +  'test has failed, program expected << ' + l + ' >> but ez-edge sends << ' + bLr.decode() + ' >>')
+                        dataForLog = { timestamp()+ ' *** '  + 'login test , test type : ' + testType : {'logs' : logger , 'test result' : testResault }}
+                        oyf.orderedYmal_append(logfilepath , dataForLog)
+                        return testResault 
+                ser.write(b'\r')
+                lines = ser.readlines()
+                for line in lines:
+                    li = line.decode()
+                    rli = remTerminalEsc(li)
+                    print (rli)
+                    logger.append( timestamp() + ' *** ' + rli)
+                    if li.find('Password:')>= 0: 
+                        for l in sPass:
+                            ser.write(l.encode('ascii'))
+                            #print ('--> ' , l)
+                            time.sleep(0.25)
+                            #print('<-- ' , bLr)
+                        ser.write(b'\r')
+                        line = ser.readline()
+                        li = line.decode()
+                        rli = remTerminalEsc(li)
+                        print (rli)
+                        logger.append( timestamp() + ' *** ' + rli)
+                        while not li == '':
+                            if  li.find('EZ-EDGE Local Craft Interface - Main Menu')>=0 : 
+                                isLoginTest = True
+                                if testType == 'login' : testResault = 'passed'
+                                
+                            elif li.find('Error: incorrect login')>=0 : 
+                                if testType == 'badlogin' : testResault = 'passed'
+
+                            line = ser.readline()
+                            li = line.decode()  
+                            rli = remTerminalEsc(li)  
+                            print (rli)
+                            logger .append( timestamp() + ' *** ' + rli)
+                     
+                    
+                           
+                        if testResault == 'passed' : 
+                            print ('test has been passed')
+                            logger.append( timestamp() + ' *** ' + 'test passed')
+                            dataForLog = { timestamp() + ' *** ' + 'login test , test type : ' + testType : {'logs' : logger , 'test result' : testResault }}
+                            oyf.orderedYmal_append(logfilepath , dataForLog)
+                            return testResault
+
+                
+                print ('test failed,  password file is expected, but ez-edge sends: ' + li)
+                logger.append( timestamp() + ' *** ' + 'test has been failed,  password filed is expected, but ez-edge sends: ' + li)
+                dataForLog = { timestamp() + ' *** ' + 'login test , test type : ' + testType : {'logs' : logger , 'test result' : testResault }}
+                oyf.orderedYmal_append(logfilepath , dataForLog)
+                testResault = 'failed'
+                return testResault 
+
+        '''
+        elif li.find('Password:')>= 0: 
+
+            for l in sPass:
+                    ser.write(l.encode('ascii'))
+                    #print ('--> ' , l)
+                    time.sleep(0.25)
+                    #print('<-- ' , bLr)
+            ser.write(b'\r')
+        elif li.find('Press any key')>= 0: 
+                ser.write(b'\r')               '''
             
 # to find out session of serial connection, if it was logged in initially     
 def whereAmI(toWrite):
@@ -65,21 +186,21 @@ def whereAmI(toWrite):
     return currentPage
 
 # to logout (please notice that code is intelligent enough to logout from any pages    
-def gotoPageBackward(dcurrentPage , toPage , mssg):
+def gotoPageBackward(dcurrentPage = 'anywhere' , toPage = 'exit' , mssg = ''):
 
     # depends on the current page we need different action to logout, each def will provide steps to logout from each page, in future if we add new 
     # pages to LCI, new def should be added here as well as in serialStructure.yaml file
     def notloginLogout():
         return dcurrentPage
     def waitLogout():
-        print ('you are log out but because of too many invalid login you need to wait 1 min to be able to reconnect to system (wait please ...)')
+        print ('you are logged out because of too many invalid login you need to wait 1 min to be able to reconnect to system (wait please ...)')
         for i in range(1,60):
             print('*' , end = '')
             time.sleep(1)
-        return 'notlogin'
+        return dcurrentPage
 
     def badLoginLogout(): 
-        return 'notlogin'
+        return dcurrentPage
 
     def returnLogout(rreturnCode):
         ifany = ser.readlines() #to make sure LCI finished sending and it is ready to receive new command
@@ -117,10 +238,37 @@ def gotoPageBackward(dcurrentPage , toPage , mssg):
         currentPage = 'unknown'
  
         
+# find the path to each page in tree
+def structureBrowser (serDic , toPage):
+    global forwardTree
+    forwardTree = []
+    #this recursive function will return the path to each page in tree
+    def spider(subSerDic):
+        global strcFoundflag
+        strcFoundflag = True
+        for itm in subSerDic :
+            forwardTree.append(itm)
+            if subSerDic[itm]['expectedPage'] == toPage : 
+                strcFoundflag = False
+                return 
+            else: 
+                    rSerDic = subSerDic[itm]['PageOptions']
+                    if not rSerDic is'0': spider (rSerDic)
+                    if strcFoundflag : forwardTree.pop()
+                    else : return
+        return 
 
-           
+    spider(serDic)
+    return forwardTree
+          
 # to configuration test 
-def confTest():
+def loginTest(Suser,sPass, testType):
+    #first logout from anywhere to make sure system is ready to test login
+    gotoPageBackward() #default value is logout
+
+    
+
+    
     pass
 
 
@@ -148,7 +296,7 @@ this program will log in into ez-edge automatically to test serial port
     if not input('please confirm you want run the test[y]: ') == 'y' : exit()
 
 
-    #Parameters
+    #Parameters and variables
     
     global passOfDay
     passOfDay = False
@@ -168,6 +316,12 @@ this program will log in into ez-edge automatically to test serial port
     timeout = vars['timeout']
 
 
+    #load variables for test 
+    sUser = vars['serialUser']
+    sPass = vars['serialPass']
+    loggerPath = vars['loggerPath']
+
+
     #load ez-edge LCI structure
     fStructure = vars['fStructure']
     global serStrc
@@ -180,7 +334,11 @@ this program will log in into ez-edge automatically to test serial port
     serConfStrc = oyf.orderedYaml_loader(fserconfStrc)
     
 
+    # load test script file name
+    scriptFile = vars['scriptFile']
 
+    
+    
 
     # this part of program will remove the ESC ansi codes from strings 
     ESC = Literal('\x1b')
@@ -212,20 +370,32 @@ this program will log in into ez-edge automatically to test serial port
         exit()
 
     # to find out session of serial connection, if it was logged in initially     
-    gotoPageBackward('anywhere' , 'wtert' , '')
+    #initialCurrentPage = gotoPageBackward('anywhere' , 'exit' , '')
 
 
     #login to ez-edge
-    serialLogin()
-            
+    #serialLogin()
+    theLogFile = loggerPath + 'serialPortTest_'+ timestamp() +'.yaml'
+    serialLoginTest(sUser,sPass,'login',theLogFile)
+    serialLoginTest(sUser+'dd',sPass,'badlogin',theLogFile)
+    serialLoginTest(sUser,sPass +'dd','badlogin',theLogFile)
+    serialLoginTest(sUser,sPass +'dd','login',theLogFile)
+    serialLoginTest(sUser,sPass ,'badlogin',theLogFile)
+    
+    testScriptLoader(scriptFile)
+    '''
+    for ii1 in serConfStrc[1]['PageOptions']:
+        forwardTree = []
+        print (serConfStrc[1]['PageOptions'][ii1]['expectedPage'] , structureBrowser(serConfStrc, serConfStrc[1]['PageOptions'][ii1]['expectedPage'])    )
+        for ii2 in serConfStrc[1]['PageOptions'][ii1]['PageOptions']:
+            forwardTree = []
+            print (serConfStrc[1]['PageOptions'][ii1]['PageOptions'][ii2]['expectedPage'] , structureBrowser(serConfStrc,serConfStrc[1]['PageOptions'][ii1]['PageOptions'][ii2]['expectedPage'])    )
+            w = input('wait for next .....')
+            '''
+    
+    
     while 1 :
-           '''response = ser.readlines()
            
-           for li in response:
-               unColorString = nonAnsiString(li.decode())
-               nnn = ['1 -' , '2 -' , '3 -' , '4 -' , '5 -' , '6 -', '7 -' , '8 -']
-               for nn in nnn: unColorString = unColorString.replace( nn , ' \n' + nn )
-               print(unColorString ) '''
 
            li1 = ser.readline()
            
@@ -234,7 +404,6 @@ this program will log in into ez-edge automatically to test serial port
                input1 = input('>> ') 
                ser.write(input1.encode('ascii' , 'replace'))
                rr = ser.read(1)
-               #print (rr)
                time.sleep(0.15)
                ser.write(b'\r')
            else :
@@ -246,7 +415,6 @@ this program will log in into ez-edge automatically to test serial port
                     input1 = input(unColorString1 + ' >>') 
                     ser.write(input1.encode('ascii' , 'replace'))
                     rr = ser.read(1)
-                    #print (rr)
                     time.sleep(0.15)
                     ser.write(b'\r')
                else:
