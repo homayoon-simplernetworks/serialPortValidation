@@ -1,0 +1,11 @@
+
+#name of test : testType ; param1 ; param 2 ...
+# testType should be: (for new test please add them in serialConfigurationTest.ymal)
+#		serialLoginTest : user ; pass ; login test type :(login , badlogin , wait)
+#		configTest : ip ; mask ; gateway ; confirmation
+
+serialLoginTest1 : serialLoginTest ; admin ; ez-edge#1 ; login
+#serialLoginTest2 : serialLoginTest ; admin ; ez-edge#1; badlogin
+#serialLoginTest3 : serialLoginTest ; admin ; ez-edge#111 ; wait
+
+configTest1 : configTest ; netConfig ; 192.168.3.254 ; 255.255.255.0 ; 192.168.3.1 ; N

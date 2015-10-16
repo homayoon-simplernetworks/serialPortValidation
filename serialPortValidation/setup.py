@@ -1,4 +1,4 @@
-# setup.py
+﻿# setup.py
 from distutils.core import setup
 import py2exe
-setup(console=['TelnetValidation.py'])
+setup(console=['serialPortValidation.py'])

@@ -14,7 +14,7 @@ class yld(object):
                         data = yaml.load(file_descriptor)
                 return data
 
-    def ymal_dump(filepath, data):
+    def yaml_dump(filepath, data):
                 """Dump data to a yaml file"""
                 with open(filepath, "w") as file_desxriptor:
                         yaml.dump(data, file_descriptor)
