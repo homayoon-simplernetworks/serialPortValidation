@@ -7,53 +7,90 @@
         PageOptions : '0'
         PageSettings : 
             step1 :
-              1 : 'Enter your selection ['
-              'wrongValue' : '3'
-              'enter' : 'Enter your selection ['
+              defaultValue : 1
+              expectedPrompt : 'Enter your selection ['
+              wrongValue : '3'
             step2 :
-              1 : 'Please confirm you want to proceed with the new configuration [N]:'
-              'wrongValue' : '3'             
-              'enter' : 'Please confirm you want to proceed with the new configuration [N]:'
+              defaultValue : 1
+              expectedPrompt : 'Enter your selection ['
+              wrongValue : '3'
             step3 : 
               'N' : 'EZ-EDGE Local Craft Interface - Configuration Parameters'
               'Y' : 'Changes applied successfully. Press any key to continue'
-              'd' : 'Please confirm you want to proceed with the new configuration [N]:'
+              expectedPrompt : 'Please confirm you want to proceed with the new configuration [N]:'
               'enter' : 'EZ-EDGE Local Craft Interface - Configuration Parameters'
     2 : 
         expectedPage : 'netConfig'
         PageOptions : '0'
         PageSettings : 
             step1 :
-              '192.168.3.254' : 'EZ-EDGE Subnet mask ['
-              'wrongValue' : '333.128.3.3'
-              'enter' : 'EZ-EDGE Subnet mask ['
+              defaultValue : '192.168.3.120'
+              expectedPrompt : 'EZ-EDGE IP address ['
+              wrongValue : '333.128.3.3'
             step2 :
-              '255.255.255.0' : 'EZ-EDGE Default Gateway ['
-              'wrongValue' : '333.128.3.3'
-              'enter' : 'EZ-EDGE Default Gateway ['
+              defaultValue : '255.255.255.0'
+              expectedPrompt : 'EZ-EDGE Subnet mask ['
+              wrongValue : '333.128.3.3'
             step3 : 
-              '192.168.3.1' : 'Please confirm you want to proceed with the new configuration [N]:'
-              'wrongValue' : '333.128.3.3'
-              'enter' : 'Please confirm you want to proceed with the new configuration [N]:'
+              defaultValue : '192.168.3.1'
+              expectedPrompt : 'EZ-EDGE Default Gateway ['
+              wrongValue : '333.128.3.3'
             step4 : 
               'N' : 'Configuration Parameters'
               'Y' : 'Changes applied successfully. Press any key to continue'
-              'd' : 'Please confirm you want to proceed with the new configuration [N]:'
+              expectedPrompt : 'Please confirm you want to proceed with the new configuration [N]:'
               'enter' : 'EZ-EDGE Local Craft Interface - Configuration Parameters'
     3 : 
         expectedPage : 'timeConfig'
         PageOptions : '0'
         PageSettings : 
             step1 :
-              '2015-10-12' : 'Current UTC Time (HH:MM:SS)  ['
-              'wrongValue' : '2054-23-28'
-              'enter' : 'Current UTC Time (HH:MM:SS)  ['
+              defaultValue : '2015-10-12'
+              expectedPrompt : 'Current UTC Date (YYYY-MM-DD)  ['
+              wrongValue' : '2054-23-28'
             step2 :
-              '12:10:09' : Please confirm you want to proceed with the new configuration [N]:'
-              'wrongValue' : '28:15:12'
-              'enter' : Please confirm you want to proceed with the new configuration [N]:'
+              defaultValue : '12:10:09' 
+              expectedPrompt : 'Current UTC Time (HH:MM:SS)  ['
+              wrongValue : '28:15:12'
             step3 : 
               'N' : 'EZ-EDGE Local Craft Interface - Configuration Parameters'
               'Y' : 'Changes applied successfully. Press any key to continue'
-              'd' : 'Please confirm you want to proceed with the new configuration [N]:'
+              expectedPrompt : 'Please confirm you want to proceed with the new configuration [N]:'
               'enter' : 'EZ-EDGE Local Craft Interface - Configuration Parameters'
+2 :
+  expectedPage  : 'currentAlarms'
+  PageOptions : '0'
+  PageSettings : 
+    step1 :
+      defaultValue : 'enter'
+      expectedPrompt : 'Press any key to return to menu'
+      wrongValue : '3'
+
+3 :
+  expectedPage  : 'reset'
+  PageOptions : '0'
+  PageSettings : 
+    step1 :
+      defaultValue : 'N'
+      expectedPrompt : 'Please confirm you want to restart the system [N]'
+      wrongValue : 'd'
+4 :
+  expectedPage  : 'changePass'
+  PageOptions : '0'
+  PageSettings : 
+    step1 :
+      defaultValue : 'ez-edge#1'
+      expectedPrompt : 'Enter current Local Craft Interface password'
+      wrongValue : 'Error: Invalid current password'
+    step2 :
+      defaultValue : 'ez-edge#1'
+      expectedPrompt : 'Enter new Local Craft Interface password'
+      wrongValue : 'Error: New and confirm password are different'
+    step3 :
+      defaultValue : 'ez-edge#1'
+      expectedPrompt : 'Confirm new Local Craft Interface password'
+      wrongValue : 'Error: New and confirm password are different'
+    step4 :
+      defaultValue : 'N'
+      expectedPrompt : 'Please confirm you want to proceed with the new configuration [N]'
+      wrongValue : 'd'

@@ -1,11 +1,34 @@
 
-#name of test : testType ; param1 ; param 2 ...
+#name of test : testType ; param1 ; param 2 ... (Note: this name should be unique)
 # testType should be: (for new test please add them in serialConfigurationTest.ymal)
 #		serialLoginTest : user ; pass ; login test type :(login , badlogin , wait)
-#		configTest : ip ; mask ; gateway ; confirmation
+#		configTest ; (one of below options:) 
+#					netConfig : ip ; mask ; gateway ; confirmation
+#					sysconfig : 1 , 1 . Y/N
+#					timeConfig : 2015-10-12 ; 12:10:09 ; Y/N
+#					currentAlarms ; enter
+#					reset ; Y/N
+#					changePass ; ez-edge#2 ; ez-edge#1 ; ez-edge#1 ; Y/N/error
 
-serialLoginTest1 : serialLoginTest ; admin ; ez-edge#1 ; login
+#serialLoginTest1 : serialLoginTest ; admin ; ez-edge#1 ; login
 #serialLoginTest2 : serialLoginTest ; admin ; ez-edge#1; badlogin
 #serialLoginTest3 : serialLoginTest ; admin ; ez-edge#111 ; wait
 
-configTest1 : configTest ; netConfig ; 192.168.3.254 ; 255.255.255.0 ; 192.168.3.1 ; N
+#configTest1 : configTest ; netConfig ; 192.168.3.254 ; 255.255.255.0 ; 192.168.3.1 ; N
+#configTest2 : configTest ; netConfig ; 192.168.3.433 ; 255.255.255.0 ; 192.168.3.1 ; N
+#configTest3 : configTest ; netConfig ; 192.168.3.254 ; 255.255.433.0 ; 192.168.3.1 ; y
+
+#configTest4 : configTest ; sysconfig ; 1 ; 2 ; N
+#configTest5 : configTest ; sysconfig ; 1 ; 1 ; N
+
+#configTest6 : configTest ; netConfig ; 192.168.3.254 ; 255.255.255.0 ; 192.168.3.1 ; y
+
+#configTest7 : configTest ; timeConfig ; 2015-10-12 ; 12:10:09 ; N
+
+#configTest8 : configTest ; sysconfig ; enter ; enter ; N
+#configTest9 : configTest ; currentAlarms ; enter
+#configTest10 : configTest ; reset ; N
+configTest11 : configTest ; changePass ; ez-edge#1 ; ez-edge#1 ; ez-edge#1 ; N
+configTest12 : configTest ; changePass ; ez-edge#2 ; ez-edge#1 ; ez-edge#1 ; error
+configTest13 : configTest ; changePass ; ez-edge#1 ; ez-edge#1 ; ez-edge#1 ; error
+configTest14 : configTest ; changePass ; ez-edge#1 ; ez-edge#1 ; ez-edge#1 ; N

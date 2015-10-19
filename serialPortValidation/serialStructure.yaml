@@ -30,7 +30,7 @@ netConfig :
 timeConfig : 
   idf : 'EZ-EDGE Local Craft Interface - Time and Date Configuration'
   returnCode : 404
-displayAlarm : 
+currentAlarms : 
   idf: 'EZ-EDGE Local Craft Interface - Current Alarms'
   returnCode : 405
 reset : 
@@ -42,3 +42,6 @@ changePass :
 unknown : 
   idf: ' could be any things ......' 
   returnCode : 1004
+booting : 
+  idf: 'Simpler Networks EZ-EDGE Boot' 
+  returnCode : 1005

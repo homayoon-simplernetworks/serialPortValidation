@@ -51,7 +51,6 @@ def serialLogin():
                     if not bLr== l.encode('ascii'): break
                 ser.write(b'\r')
         elif li.find('Password:')>= 0: 
-
             for l in sPass:
                     ser.write(l.encode('ascii'))
                     #print ('--> ' , l)
@@ -77,7 +76,7 @@ def serialLoginTest(varlist):
     global isLoginTest
     isLoginTest = False
     logger = []
-    testResault = 'failed'
+    testResult = 'failed'
     badlogin_tried = 1
 
     #firs logout from anywhere and prepare system for login test
@@ -127,12 +126,12 @@ def serialLoginTest(varlist):
                     bLr = ser.read(1)
                     logger.append( bLr.decode())
                     if not bLr== l.encode('ascii'): 
-                        testResault = 'failed'
+                        testResult = 'failed'
                         print ('test has failed, program expected << ' + l + ' >>but ez-edge sends << ' + bLr.decode()+ ' >>') 
                         logger.append( timestamp() + ' *** ' +  'test has failed, program expected << ' + l + ' >> but ez-edge sends << ' + bLr.decode() + ' >>')
-                        dataForLog = { testId : {'logs' : logger , 'test result' : testResault }}
+                        dataForLog = { testId : {'logs' : logger , 'test result' : testResult }}
                         oyf.orderedYaml_append(logfilepath , dataForLog)
-                        return testResault 
+                        return testResult 
                 ser.write(b'\r')
                 lines = ser.readlines()
                 for line in lines:
@@ -155,13 +154,13 @@ def serialLoginTest(varlist):
                         while not li == '':
                             if  li.find('EZ-EDGE Local Craft Interface - Main Menu')>=0 : 
                                 isLoginTest = True
-                                if testType == 'login' : testResault = 'passed'
+                                if testType == 'login' : testResult = 'passed'
                                 
                             elif li.find('Error: incorrect login')>=0 : 
-                                if testType == 'badlogin' : testResault = 'passed'
+                                if testType == 'badlogin' : testResult = 'passed'
 
                             if li.find('Too many invalid login')>=0 : 
-                                if testType == 'wait' : testResault = 'passed'
+                                if testType == 'wait' : testResult = 'passed'
                                 print ('program will be reconnect after 60s please wait')
                                 for i in range(1,61):
                                     for ch in [ ' .\  ' , ' .|  ' , ' ./  ' , ' .-- '] :
@@ -178,22 +177,22 @@ def serialLoginTest(varlist):
                      
                     
                            
-                        if testResault == 'passed' : 
+                        if testResult == 'passed' : 
                             print ('test has been passed')
                             logger.append( timestamp() + ' *** ' + 'test passed')
-                            dataForLog = { testId : {'logs' : logger , 'test result' : testResault }}
+                            dataForLog = { testId : {'logs' : logger , 'test result' : testResult }}
                             oyf.orderedYaml_append(logfilepath , dataForLog)
-                            return testResault
+                            return testResult
 
                 if testType == 'wait' and badlogin_tried<=3 :
                     badlogin_tried = badlogin_tried + 1
                 else:
-                    print ('test failed,  program expects ' + testType+ ' but es-edge is not, system logged in << '  + str( isLoginTest) + ' >>')
-                    testResault = 'failed'
-                    logger.append( timestamp() + ' *** ' + 'test failed,  program expects ' + testType+ ' but es-edge is not, system logged in << '  + str( isLoginTest) + ' >>')
-                    dataForLog = {testId : {'logs' : logger , 'test result' : testResault }}
+                    print ('test failed,  program expects ' + testType+ ' but ez-edge is not, system logged in << '  + str( isLoginTest) + ' >>')
+                    testResult = 'failed'
+                    logger.append( timestamp() + ' *** ' + 'test failed,  program expects ' + testType+ ' but ez-edge is not, system logged in << '  + str( isLoginTest) + ' >>')
+                    dataForLog = {testId : {'logs' : logger , 'test result' : testResult }}
                     oyf.orderedYaml_append(logfilepath , dataForLog)
-                    return testResault 
+                    return testResult 
 
         
             
@@ -239,6 +238,13 @@ def gotoPageBackward(dcurrentPage = 'anywhere' , toPage = 'exit' , mssg = ''):
              time.sleep(0.25)
         return dcurrentPage
 
+    def bootingLogout():
+        print ('Simpler Networks EZ-EDGE Boot you need to wait several min to be able to reconnect to system (wait please ...)')
+        for ch in [ ' .\  ' , ' .|  ' , ' ./  ' , ' .-- '] :
+             print(ch  , end = '\r')
+             time.sleep(0.25)
+        return dcurrentPage
+
     def badLoginLogout(): 
         return dcurrentPage
 
@@ -248,7 +254,8 @@ def gotoPageBackward(dcurrentPage = 'anywhere' , toPage = 'exit' , mssg = ''):
         rr = ser.read(1)
         time.sleep(0.15)
         #ser.write(b'\r')
-        gotoPageBackward('anywhere' , toPage , '\r')
+        dcurrentPage = gotoPageBackward('anywhere' , toPage , '\r')
+        return dcurrentPage
         
 
     
@@ -266,17 +273,55 @@ def gotoPageBackward(dcurrentPage = 'anywhere' , toPage = 'exit' , mssg = ''):
             return dcurrentPage
 
         if  returnCode<400 : 
-            returnLogout(str(returnCode))
-            return
+            dcurrentPage = returnLogout(str(returnCode))
+            return dcurrentPage
         elif returnCode<500 : 
-            gotoPageBackward('anywhere' , toPage , '\r')
-            return
+            dcurrentPage = gotoPageBackward('anywhere' , toPage , '\r')
+            return dcurrentPage
         
         eval(dcurrentPage + 'Logout')()
     except  Exception as err:
         print('the (' + dcurrentPage +') item in serialStructure.yaml file is not implemented in code. program will act as unknown page ' , err) 
         currentPage = 'unknown'
  
+def gotoPageForward(dcurrentPage = 'anywhere' , toPageForward = 'mainMenu' , mssg = ''):
+    
+    pageNavigator = []
+    pageNavigator = structureBrowser (serConfStrc , toPageForward)
+    toPageForward = toPageForward
+    curentPage = gotoPageBackward(dcurrentPage , toPageForward , mssg = '') 
+
+    if curentPage == toPageForward: return curentPage , pageNavigator
+    elif not curentPage ==  'mainMenu' : serialLoginTest(['login' , sUser , sPass , 'login' , theLogFile ] )
+
+
+    line = ser.readline()
+    li = line.decode()
+    while not li =="" : 
+            rli = remTerminalEsc(li)
+            logger.append( timestamp()+ ' *** ' + rli)
+            print (rli)
+            line = ser.readline()
+            li = line.decode()
+    
+    
+    for page in pageNavigator : 
+        ser.write(str ( page).encode('ascii' , 'replace'))
+        rr = ser.read(1)
+        logger.append(timestamp() +' ' + str (rr) )
+        time.sleep(0.15)
+        ser.write(b'\r')
+        line = ser.readline()
+        li = line.decode()
+        while not li =="" : 
+            lastline = li
+            rli = remTerminalEsc(li)
+            logger.append( timestamp()+ ' *** ' + rli)
+            print (rli)
+            line = ser.readline()
+            li = line.decode()
+    return toPageForward , pageNavigator , lastline
+
         
 # find the path to each page in tree
 def structureBrowser (serDic , toPage):
@@ -303,86 +348,165 @@ def structureBrowser (serDic , toPage):
           
 # to configuration test 
 def configTest(varlist):
-    testType = varlist.pop(0)
-    toPage = varlist.pop(0)
-    id = varlist.pop()
-    logfilepath = varlist.pop()
-    testId = id  + ' --- ' + timestamp()+ ' *** '  + 'test type-->> ' # + testType
+    #two first items and two last items in varilist is not parameters pop() function already removed all of them
+    parameteres = varlist
 
-
-    #first item and last two items in varilist is not parameters 
-    paramiteres = varlist
+    testType = parameteres.pop(0)
+    toPage = parameteres.pop(0)
+    id = parameteres.pop()
+    logfilepath = parameteres.pop()
+    testId = id  + ' --- ' + timestamp()+ ' *** '  + 'test type-->> ' + testType + ' : ' + toPage
     
     
-
     logger = []
+    testResult = 'failed'
+
     logger.append(timestamp() +' Config test start the command is <<'+ str (varlist) + '>>'  )
     print (timestamp() +' Config test start the command is <<'+ str( varlist) + '>>')
 
-    pageNavigator = structureBrowser (serConfStrc , toPage)
-    gotoPageBackward('anywhere' , 'mainMenu' , mssg = '') #default value is logout
+    #for each configuration test we need to navigate to that config page, below function will navigate to that page, it is intelligent enough 
+    # to navigate from any page to any other page and auto login if it is necessary, please note: for auto login user-name and password should be correct in variables.yaml
+    curentPage , pageNavigator , lastline = gotoPageForward('anywhere' , toPage , mssg = '') #default value is logout
+    
+    
+    #reading the out put of serial port before sending commands 
     line = ser.readline()
     li = line.decode()
     while not li =="" : 
+            lastline = li
             rli = remTerminalEsc(li)
             logger.append( timestamp()+ ' *** ' + rli)
             print (rli)
             line = ser.readline()
             li = line.decode()
 
-    for page in pageNavigator : 
-        ser.write(str ( page).encode('ascii' , 'replace'))
-        rr = ser.read(1)
-        logger.append(timestamp() +' ' + str (rr) )
-        time.sleep(0.15)
-        ser.write(b'\r')
-        line = ser.readline()
-        li = line.decode()
-        while not li =="" : 
-            rli = remTerminalEsc(li)
-            logger.append( timestamp()+ ' *** ' + rli)
-            print (rli)
-            line = ser.readline()
-            li = line.decode()
+    #according previous function curentPage == toPage should be true, in any other cases gotoPageForward('anywhere' , toPage , mssg = '') has problem
+    if curentPage == toPage:
+         
+         #load steps, default values and conditions from serialConfigurationTest.Yaml, data is already loaded in serConfStrc
+         tempDic = {}
+         tempDic = serConfStrc
+         temppageNavigator = pageNavigator
+         lastpage = temppageNavigator.pop()
+         
+         
+         try:
+             for page in temppageNavigator:
+                tempDic = tempDic[page]['PageOptions'] 
+             tempDic = tempDic[lastpage]['PageSettings']  # load steps, default values and conditions
+         except  :
+             logger.append( timestamp() + ' *** please check serialConfigurationTest.Yaml file in this path there is problem in this path' +  str (pageNavigator))  
+             print (  timestamp() + ' *** please check serialConfigurationTest.Yaml file in this path there is problem in this path' +  str (pageNavigator))
+             dataForLog = { testId : {'logs' : logger , 'test result' : testResult }}
+             oyf.orderedYaml_append(logfilepath , dataForLog)
+             return testResult
+         stepIndex = 0
+
+         #to check if script expect error or not
+         if parameteres[len(parameteres)-1] == 'error': expectError = True
+         else : expectError = False
+         expectErrorValid = False #to check if we expect error it goes to error or not
+
+         for par in parameteres:
+             stepIndex += 1 
+             if lastline.find( tempDic['step'+str (stepIndex)]['expectedPrompt']) >= 0:
+                 if str (par) == 'enter' : par = ''
+                 for l in str (par):
+                        ser.write(l.encode('ascii'))
+                        logger.append('sent by program to ez-edge  --->   ' + l)
+                        print ('sent by program to ez-edge  --->   ' + l)
+                        bLr = ser.read(1)
+                        logger.append( bLr.decode())
+                        if not bLr== l.encode('ascii') and not toPage == 'changePass' : 
+                            testResult = 'failed'
+                            print ('test has failed, program expected << ' + l + ' >>but ez-edge sends << ' + bLr.decode()+ ' >>') 
+                            logger.append( timestamp() + ' *** ' +  'test has failed, program expected << ' + l + ' >> but ez-edge sends << ' + bLr.decode() + ' >>')
+                            dataForLog = { testId : {'logs' : logger , 'test result' : testResult }}
+                            oyf.orderedYaml_append(logfilepath , dataForLog)
+                            return testResult 
+                 ser.write(b'\r')
+                 
+                 line = ser.readline()
+                 li = line.decode()
+                 while not li =="" : 
+                    lastline = li
+                    rli = remTerminalEsc(li)
+                    logger.append( timestamp()+ ' *** ' + rli)
+                    print (rli)
+                    if lastline.find( 'Error:') : 
+                        for stepWrongValue in tempDic:
+                            if lastline.find(  tempDic[stepWrongValue]['wrongValue']) >=0  and expectError : expectErrorValid = True
+                           
+                    line = ser.readline()
+                    li = line.decode()
+
+                 try:
+                     if len (parameteres) > stepIndex :
+                         sameexpectedPrompt = tempDic['step'+str (stepIndex)]['expectedPrompt'] == tempDic['step'+str (stepIndex+1)]['expectedPrompt'] 
+
+
+                     if lastline.find(  tempDic['step'+str (stepIndex)]['expectedPrompt']) >=0 and not sameexpectedPrompt : 
+                          defValue = tempDic['step'+str (stepIndex)]['defaultValue']
+                          for l in str (defValue):
+                            ser.write(l.encode('ascii'))
+                            logger.append('sent by program to ez-edge  --->   ' + l)
+                            print ('sent by program to ez-edge  --->   ' + l)
+                            bLr = ser.read(1)
+                            logger.append( bLr.decode())
+                            if not bLr== l.encode('ascii') and not toPage == 'changePass': 
+                                testResult = 'failed'
+                                print ('test has failed, program expected << ' + l + ' >>but ez-edge sends << ' + bLr.decode()+ ' >>') 
+                                logger.append( timestamp() + ' *** ' +  'test has failed, program expected << ' + l + ' >> but ez-edge sends << ' + bLr.decode() + ' >>')
+                                dataForLog = { testId : {'logs' : logger , 'test result' : testResult }}
+                                oyf.orderedYaml_append(logfilepath , dataForLog)
+                                return testResult 
+                          ser.write(b'\r')
     
-    if 1:
-         for page in pageNavigator:
-             
-             pass
+                          line = ser.readline()
+                          li = line.decode()
+                          while not li =="" : 
+                            lastline = li
+                            rli = remTerminalEsc(li)
+                            logger.append( timestamp()+ ' *** ' + rli)
+                            print (rli)
+                            line = ser.readline()
+                            li = line.decode()
+                     elif  toPage == 'changePass' : pass
+                 except  :
+                     pass
+                      
+                    
+             else : 
+                 if not expectError:
+                    logger.append(timestamp() +' test failed <<'+ str( varlist) + '>> program was expecting be in ' +tempDic['step'+str (stepIndex)]['expectedPrompt']+ 
+                      ' but it is  ' +lastline+ ' lastline == tempDic[step+str (stepIndex)][expectedPrompt] should be true, in any other case serialConfigurationTest.yaml has problem' )
+                    print (timestamp() +' test failed <<'+ str( varlist) + '>> program was expecting be in ' +tempDic['step'+str (stepIndex)]['expectedPrompt']+ 
+                      ' but it is  ' +lastline+ ' lastline == tempDic[step+str (stepIndex)][expectedPrompt] should be true, in any other case serialConfigurationTest.yaml has problem' )
+                    testResult = 'failed'
+                    return testResult
+         
+         if not expectError :  testResult = 'pass'
+         elif expectErrorValid : testResult = 'pass'
+         else :  
+             logger.append(timestamp() +' test failed <<'+ str( varlist) + '>> program was expecting be in error but it is  ' +lastline+ 
+                           ' please check your parameters in script file, by using that parameters system configuration dose not show error as expected' )
+             print (timestamp() +' test failed <<'+ str( varlist) + '>> program was expecting be in error but it is  ' +lastline+ 
+                           ' please check your parameters in script file, by using that parameters system configuration dose not show error as expected' )
+             testResult = 'failed'
+             return testResult
 
-         for par in paramiteres:
-             for l in str (par):
-                    ser.write(l.encode('ascii'))
-                    bLr = ser.read(1)
-                    logger.append( bLr.decode())
-                    if not bLr== l.encode('ascii'): 
-                        testResault = 'failed'
-                        print ('test has failed, program expected << ' + l + ' >>but ez-edge sends << ' + bLr.decode()+ ' >>') 
-                        logger.append( timestamp() + ' *** ' +  'test has failed, program expected << ' + l + ' >> but ez-edge sends << ' + bLr.decode() + ' >>')
-                        dataForLog = { testId : {'logs' : logger , 'test result' : testResault }}
-                        oyf.orderedYaml_append(logfilepath , dataForLog)
-                        return testResault 
-             ser.write(b'\r')
-             
-             line = ser.readline()
-             li = line.decode()
-             while not li =="" : 
-                rli = remTerminalEsc(li)
-                logger.append( timestamp()+ ' *** ' + rli)
-                print (rli)
-                line = ser.readline()
-                li = line.decode()
-         testResault = 'pass'
     
     else:
-        logger.append(timestamp() +' test failed <<'+ str( varlist) + '>>'  )
-        print (timestamp() +' test failed <<'+ str(varlist) + '>>' )
-        testResault = 'failed'
+        logger.append(timestamp() +' test failed <<'+ str( varlist) + '>> program was expecting be in ' +toPage+ 
+                      ' but it is in ' +curentPage+ ' curentPage == toPage should be true, in any other cases gotoPageForward(anywhere , toPage , mssg  ) has problem' )
+        print (timestamp() +' test failed <<'+ str( varlist) + '>> program was expecting be in ' +toPage+ ' but it is in ' +curentPage+
+               ' curentPage == toPage should be true, in any other cases gotoPageForward(anywhere , toPage , mssg  ) has problem' )
+        testResult = 'failed'
     
-
-    dataForLog = {testId : {'logs' : logger , 'test result' : testResault }}
+    print ('test result is : ' ,testResult)
+    dataForLog = {testId : {'logs' : logger , 'test result' : testResult }}
     oyf.orderedYaml_append(logfilepath , dataForLog)
-    return testResault 
+    return testResult 
     
 
 
@@ -414,7 +538,7 @@ this program will log in into ez-edge automatically to test serial port
     
     global passOfDay
     passOfDay = False
-
+    logger = []
     # load parameters from yaml files
 
     #load serial port variables 
@@ -446,6 +570,7 @@ this program will log in into ez-edge automatically to test serial port
     oyf = orderedYld.orderedYld
     fserconfStrc = vars['fserconfStrc']
     serConfStrc = oyf.orderedYaml_loader(fserconfStrc)
+    global pageNavigator  #this parameter will use for extract path to each page
     
 
     # load test script file name
@@ -496,9 +621,7 @@ this program will log in into ez-edge automatically to test serial port
             par.append(theLogFile)
             par.append(script)
             
-            ################################rem
-            pageNavigator = structureBrowser (serConfStrc , par[1])
-            print ( pageNavigator)
+            
 
 
             eval(par[0])(par)
