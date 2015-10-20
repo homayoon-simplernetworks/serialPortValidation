@@ -33,7 +33,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="scriptFile.yaml" />
-    <Content Include="serialConfigurationTest.yaml" />
+    <Content Include="serialConfigurationTestPassOfDay.yaml" />
     <Content Include="serialConfigurationTest2.yaml" />
     <Content Include="serialStructure.yaml" />
     <Content Include="variables.yaml">

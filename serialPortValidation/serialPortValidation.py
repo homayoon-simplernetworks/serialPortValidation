@@ -31,7 +31,7 @@ def serialLogin():
     ser.write(b'\r')
     while not isLogin:
         line = ser.readline()
-        li = line.decode()
+        li = line.decode('ascii')
         unColorString = nonAnsiString(li)
         nnn = ['1 -' , '2 -' , '3 -' , '4 -' , '5 -' , '6 -', '7 -' , '8 -']
         for nn in nnn: unColorString = unColorString.replace( nn , ' \n' + nn )
@@ -67,6 +67,7 @@ def serialLoginTest(varlist):
     sPass= varlist[2] 
     testType= varlist[3]
     logfilepath = varlist[4]
+    logfilepathFailed = logfilepath + '-Failed.yaml'
     try :
         id  = varlist[5]
     except:
@@ -87,13 +88,13 @@ def serialLoginTest(varlist):
     
     while not isLoginTest:
         line = ser.readline()
-        li = line.decode()
+        li = line.decode('ascii')
         
         if li == '' : 
             print('wait for ez-edge connection it may blocked and reply after 60s ...' )
             ser.write(b'\r')
             line = ser.readline()
-            li = line.decode()
+            li = line.decode('ascii')
             
         while li == '' : 
             for ch in [ ' .\  ' , ' .|  ' , ' ./  ' , ' .-- '] :
@@ -101,7 +102,7 @@ def serialLoginTest(varlist):
                     time.sleep(0.15)
             ser.write(b'\r')
             line = ser.readline()
-            li = line.decode()
+            li = line.decode('ascii')
 
         rli = remTerminalEsc(li)
         logger.append( timestamp()+ ' *** ' + rli)
@@ -118,36 +119,60 @@ def serialLoginTest(varlist):
                 
             ser.write(b'\r')
 
-
+        backspaceValue = False
+        backspaceValueCleaned = False
         #check if asking for user:
         if li.find('User:')>= 0: 
                 for l in sUser:
+                    if l == "\\" and sUser.find('\\x08')>= 0 : #check if there is backspace in parameteres 
+                            l = '\x08' # the following lines will remove x08 
+                            backspaceValue  = True 
+                            backspaceValueCleaned =  True
+                    if backspaceValue and  l =='x' : l =''
+                    elif backspaceValue and  l =='0' : l =''
+                    elif backspaceValue and  l =='8' : 
+                            l =''
+                            backspaceValue = False
+
+
                     ser.write(l.encode('ascii'))
                     bLr = ser.read(1)
-                    logger.append( bLr.decode())
-                    if not bLr== l.encode('ascii'): 
+                    logger.append( bLr.decode('ascii'))
+                    if not bLr== l.encode('ascii') and not backspaceValueCleaned: 
                         testResult = 'failed'
-                        print ('test has failed, program expected << ' + l + ' >>but ez-edge sends << ' + bLr.decode()+ ' >>') 
-                        logger.append( timestamp() + ' *** ' +  'test has failed, program expected << ' + l + ' >> but ez-edge sends << ' + bLr.decode() + ' >>')
+                        print ('test has failed, program expected << ' + l + ' >>but ez-edge sends << ' + bLr.decode('ascii')+ ' >>') 
+                        logger.append( timestamp() + ' *** ' +  'test has failed, program expected << ' + l + ' >> but ez-edge sends << ' + bLr.decode('ascii') + ' >>')
                         dataForLog = { testId : {'logs' : logger , 'test result' : testResult }}
                         oyf.orderedYaml_append(logfilepath , dataForLog)
+                        oyf.orderedYaml_append(logfilepathFailed , dataForLog)
                         return testResult 
+                    if not backspaceValue and backspaceValueCleaned : backspaceValueCleaned =  False
                 ser.write(b'\r')
                 lines = ser.readlines()
                 for line in lines:
-                    li = line.decode()
+                    li = line.decode('ascii')
                     rli = remTerminalEsc(li)
                     print (rli)
                     logger.append( timestamp() + ' *** ' + rli)
                     if li.find('Password:')>= 0: 
                         for l in sPass:
+
+                            if l == "\\" and sPass.find('\\x08')>= 0 : #check if there is backspace in parameteres 
+                                l = '\x08' # the following lines will remove x08 
+                                backspaceValue  = True 
+                            if backspaceValue and  l =='x' : l =''
+                            elif backspaceValue and  l =='0' : l =''
+                            elif backspaceValue and  l =='8' : 
+                                l =''
+                                backspaceValue = False
+
                             ser.write(l.encode('ascii'))
                             #print ('--> ' , l)
                             time.sleep(0.25)
                             #print('<-- ' , bLr)
                         ser.write(b'\r')
                         line = ser.readline()
-                        li = line.decode()
+                        li = line.decode('ascii')
                         rli = remTerminalEsc(li)
                         print (rli)
                         logger.append( timestamp() + ' *** ' + rli)
@@ -170,7 +195,7 @@ def serialLoginTest(varlist):
                                 ser.write(b'\r')
 
                             line = ser.readline()
-                            li = line.decode()  
+                            li = line.decode('ascii')  
                             rli = remTerminalEsc(li)  
                             print (rli)
                             logger .append( timestamp() + ' *** ' + rli)
@@ -192,6 +217,7 @@ def serialLoginTest(varlist):
                     logger.append( timestamp() + ' *** ' + 'test failed,  program expects ' + testType+ ' but ez-edge is not, system logged in << '  + str( isLoginTest) + ' >>')
                     dataForLog = {testId : {'logs' : logger , 'test result' : testResult }}
                     oyf.orderedYaml_append(logfilepath , dataForLog)
+                    oyf.orderedYaml_append(logfilepathFailed , dataForLog)
                     return testResult 
 
         
@@ -216,7 +242,7 @@ def whereAmI(toWrite = ''):
                li = ser.readline()
                
         
-        sli  = li.decode()
+        sli  = li.decode('ascii')
         for item in serStrc :
             if serStrc[item]['idf'] in sli : 
                     knownPage = True
@@ -296,13 +322,13 @@ def gotoPageForward(dcurrentPage = 'anywhere' , toPageForward = 'mainMenu' , mss
 
 
     line = ser.readline()
-    li = line.decode()
+    li = line.decode('ascii')
     while not li =="" : 
             rli = remTerminalEsc(li)
             logger.append( timestamp()+ ' *** ' + rli)
             print (rli)
             line = ser.readline()
-            li = line.decode()
+            li = line.decode('ascii')
     
     
     for page in pageNavigator : 
@@ -312,14 +338,14 @@ def gotoPageForward(dcurrentPage = 'anywhere' , toPageForward = 'mainMenu' , mss
         time.sleep(0.15)
         ser.write(b'\r')
         line = ser.readline()
-        li = line.decode()
+        li = line.decode('ascii')
         while not li =="" : 
             lastline = li
             rli = remTerminalEsc(li)
             logger.append( timestamp()+ ' *** ' + rli)
             print (rli)
             line = ser.readline()
-            li = line.decode()
+            li = line.decode('ascii')
     return toPageForward , pageNavigator , lastline
 
         
@@ -355,6 +381,7 @@ def configTest(varlist):
     toPage = parameteres.pop(0)
     id = parameteres.pop()
     logfilepath = parameteres.pop()
+    logfilepathFailed = str(logfilepath) + '-Failed.yaml'
     testId = id  + ' --- ' + timestamp()+ ' *** '  + 'test type-->> ' + testType + ' : ' + toPage
     
     
@@ -371,16 +398,16 @@ def configTest(varlist):
     
     #reading the out put of serial port before sending commands 
     line = ser.readline()
-    li = line.decode()
+    li = line.decode('ascii')
     while not li =="" : 
             lastline = li
             rli = remTerminalEsc(li)
             logger.append( timestamp()+ ' *** ' + rli)
             print (rli)
             line = ser.readline()
-            li = line.decode()
+            li = line.decode('ascii')
 
-    #according previous function curentPage == toPage should be true, in any other cases gotoPageForward('anywhere' , toPage , mssg = '') has problem
+    #according to previous function curentPage == toPage should be true, in any other cases gotoPageForward('anywhere' , toPage , mssg = '') has problem
     if curentPage == toPage:
          
          #load steps, default values and conditions from serialConfigurationTest.Yaml, data is already loaded in serConfStrc
@@ -397,8 +424,10 @@ def configTest(varlist):
          except  :
              logger.append( timestamp() + ' *** please check serialConfigurationTest.Yaml file in this path there is problem in this path' +  str (pageNavigator))  
              print (  timestamp() + ' *** please check serialConfigurationTest.Yaml file in this path there is problem in this path' +  str (pageNavigator))
+             testResult = 'failed'
              dataForLog = { testId : {'logs' : logger , 'test result' : testResult }}
              oyf.orderedYaml_append(logfilepath , dataForLog)
+             oyf.orderedYaml_append(logfilepathFailed , dataForLog)
              return testResult
          stepIndex = 0
 
@@ -406,40 +435,54 @@ def configTest(varlist):
          if parameteres[len(parameteres)-1] == 'error': expectError = True
          else : expectError = False
          expectErrorValid = False #to check if we expect error it goes to error or not
+         backspaceValue  = False
 
          for par in parameteres:
              stepIndex += 1 
              if lastline.find( tempDic['step'+str (stepIndex)]['expectedPrompt']) >= 0:
                  if str (par) == 'enter' : par = ''
                  for l in str (par):
+                        if l == "\\" and par.find('\\x08')>= 0 : #check if there is backspace in parameteres 
+                            l = '\x08' # the following lines will remove x08 
+                            backspaceValue  = True 
+                        if backspaceValue and  l =='x' : l =''
+                        elif backspaceValue and  l =='0' : l =''
+                        elif backspaceValue and  l =='8' : 
+                            l =''
+                            backspaceValue = False
+                        
                         ser.write(l.encode('ascii'))
                         logger.append('sent by program to ez-edge  --->   ' + l)
                         print ('sent by program to ez-edge  --->   ' + l)
                         bLr = ser.read(1)
-                        logger.append( bLr.decode())
+                        logger.append( bLr.decode('ascii'))
                         if not bLr== l.encode('ascii') and not toPage == 'changePass' : 
                             testResult = 'failed'
-                            print ('test has failed, program expected << ' + l + ' >>but ez-edge sends << ' + bLr.decode()+ ' >>') 
-                            logger.append( timestamp() + ' *** ' +  'test has failed, program expected << ' + l + ' >> but ez-edge sends << ' + bLr.decode() + ' >>')
+                            print ('test has failed, program expected << ' + l + ' >>but ez-edge sends << ' + bLr.decode('ascii')+ ' >>') 
+                            logger.append( timestamp() + ' *** ' +  'test has failed, program expected << ' + l + ' >> but ez-edge sends << ' + bLr.decode('ascii') + ' >>')
                             dataForLog = { testId : {'logs' : logger , 'test result' : testResult }}
                             oyf.orderedYaml_append(logfilepath , dataForLog)
+                            oyf.orderedYaml_append(logfilepathFailed , dataForLog)
                             return testResult 
                  ser.write(b'\r')
                  
                  line = ser.readline()
-                 li = line.decode()
+                 li = line.decode('ascii')
                  while not li =="" : 
                     lastline = li
                     rli = remTerminalEsc(li)
                     logger.append( timestamp()+ ' *** ' + rli)
                     print (rli)
-                    if lastline.find( 'Error:') : 
+                    if lastline.find( 'Error:') >=0 or lastline.find( 'error:')>=0 : 
                         for stepWrongValue in tempDic:
                             if lastline.find(  tempDic[stepWrongValue]['wrongValue']) >=0  and expectError : expectErrorValid = True
                            
                     line = ser.readline()
-                    li = line.decode()
-
+                    li = line.decode('ascii')
+                    #this part of code will check if the previous parameter was accepted by ez-edge or not
+                    #there is two challenge some times expected prompt for two steps are same, in this state we can not tell that if 
+                    #parameter has been accepted or not; first block of if will help to find if the next prompt is same or not 
+                    #second challenge is for last parameter there is not any prompt and there would 
                  try:
                      if len (parameteres) > stepIndex :
                          sameexpectedPrompt = tempDic['step'+str (stepIndex)]['expectedPrompt'] == tempDic['step'+str (stepIndex+1)]['expectedPrompt'] 
@@ -452,25 +495,31 @@ def configTest(varlist):
                             logger.append('sent by program to ez-edge  --->   ' + l)
                             print ('sent by program to ez-edge  --->   ' + l)
                             bLr = ser.read(1)
-                            logger.append( bLr.decode())
+                            logger.append( bLr.decode('ascii'))
                             if not bLr== l.encode('ascii') and not toPage == 'changePass': 
                                 testResult = 'failed'
-                                print ('test has failed, program expected << ' + l + ' >>but ez-edge sends << ' + bLr.decode()+ ' >>') 
-                                logger.append( timestamp() + ' *** ' +  'test has failed, program expected << ' + l + ' >> but ez-edge sends << ' + bLr.decode() + ' >>')
+                                print ('test has failed, program expected << ' + l + ' >>but ez-edge sends << ' + bLr.decode('ascii')+ ' >>') 
+                                logger.append( timestamp() + ' *** ' +  'test has failed, program expected << ' + l + ' >> but ez-edge sends << ' + bLr.decode('ascii') + ' >>')
                                 dataForLog = { testId : {'logs' : logger , 'test result' : testResult }}
                                 oyf.orderedYaml_append(logfilepath , dataForLog)
+                                oyf.orderedYaml_append(logfilepathFailed , dataForLog)
                                 return testResult 
                           ser.write(b'\r')
     
                           line = ser.readline()
-                          li = line.decode()
+                          li = line.decode('ascii')
                           while not li =="" : 
                             lastline = li
                             rli = remTerminalEsc(li)
                             logger.append( timestamp()+ ' *** ' + rli)
                             print (rli)
+                            
+                            if lastline.find( 'Error:') >=0 or lastline.find( 'error:')>=0 : 
+                                for stepWrongValue in tempDic:
+                                    if lastline.find(  tempDic[stepWrongValue]['wrongValue']) >=0  and expectError : expectErrorValid = True
+
                             line = ser.readline()
-                            li = line.decode()
+                            li = line.decode('ascii')
                      elif  toPage == 'changePass' : pass
                  except  :
                      pass
@@ -483,6 +532,9 @@ def configTest(varlist):
                     print (timestamp() +' test failed <<'+ str( varlist) + '>> program was expecting be in ' +tempDic['step'+str (stepIndex)]['expectedPrompt']+ 
                       ' but it is  ' +lastline+ ' lastline == tempDic[step+str (stepIndex)][expectedPrompt] should be true, in any other case serialConfigurationTest.yaml has problem' )
                     testResult = 'failed'
+                    dataForLog = { testId : {'logs' : logger , 'test result' : testResult }}
+                    oyf.orderedYaml_append(logfilepath , dataForLog)
+                    oyf.orderedYaml_append(logfilepathFailed , dataForLog)
                     return testResult
          
          if not expectError :  testResult = 'pass'
@@ -493,6 +545,9 @@ def configTest(varlist):
              print (timestamp() +' test failed <<'+ str( varlist) + '>> program was expecting be in error but it is  ' +lastline+ 
                            ' please check your parameters in script file, by using that parameters system configuration dose not show error as expected' )
              testResult = 'failed'
+             dataForLog = { testId : {'logs' : logger , 'test result' : testResult }}
+             oyf.orderedYaml_append(logfilepath , dataForLog)
+             oyf.orderedYaml_append(logfilepathFailed , dataForLog)
              return testResult
 
     
@@ -502,12 +557,104 @@ def configTest(varlist):
         print (timestamp() +' test failed <<'+ str( varlist) + '>> program was expecting be in ' +toPage+ ' but it is in ' +curentPage+
                ' curentPage == toPage should be true, in any other cases gotoPageForward(anywhere , toPage , mssg  ) has problem' )
         testResult = 'failed'
+        dataForLog = { testId : {'logs' : logger , 'test result' : testResult }}
+        oyf.orderedYaml_append(logfilepath , dataForLog)
+        oyf.orderedYaml_append(logfilepathFailed , dataForLog)
     
     print ('test result is : ' ,testResult)
     dataForLog = {testId : {'logs' : logger , 'test result' : testResult }}
     oyf.orderedYaml_append(logfilepath , dataForLog)
     return testResult 
     
+def autoLogout(varlist):
+    try:
+        logger = []
+        testResult = 'failed'
+        parameteres = varlist
+        testType = parameteres.pop(0)
+        toPage = parameteres.pop(0)
+        id = parameteres.pop()
+        logfilepath = parameteres.pop()
+        logfilepathFailed = logfilepath + 'Failed.yaml'
+        testId = id  + ' --- ' + timestamp()+ ' *** '  + 'test type-->> ' + testType + ' : ' + toPage
+    
+        logger.append(timestamp() +' timeoutLogout test start the command is <<'+ str (varlist) + '>>'  )
+        print (timestamp() +' timeoutLogout test start the command is <<'+ str( varlist) + '>>')
+        gotoPageForward( 'anywhere' ,  toPage , '')
+        logger.append(timestamp() + ' *** ' + 'time.sleep(' + parameteres[0] +')')
+        print (timestamp() + ' *** ' + 'time.sleep(' + parameteres[0] +')')
+        
+        line = ser.readlines() #to make sure ez-edge is just waiting for input
+
+        time.sleep(int (parameteres[0]))
+        line  = ser.readline()
+        if line == b'' : ser.write(b'\r')
+        line = ser.readline()
+        li = line.decode('ascii')
+        while not li =='':
+            logger.append(timestamp() + ' *** ' +li)
+            print (timestamp() + ' *** ' +li)
+            if  li == 'Timed out.' : 
+                testResult = 'pass'
+            line = ser.readline()
+            li = line.decode('ascii')
+        try:
+            if testResult == 'failed' and parameteres[1] == 'error' : 
+                testResult = 'pass'
+                dataForLog = {testId : {'logs' : logger , 'test result' : testResult }}
+            else : 
+                dataForLog = {testId : {'logs' : logger , 'test result' : testResult }}
+                oyf.orderedYaml_append(logfilepathFailed , dataForLog)
+        except  :
+            pass
+        print ('test result is : ' ,testResult)
+        dataForLog = {testId : {'logs' : logger , 'test result' : testResult }}
+        oyf.orderedYaml_append(logfilepath , dataForLog)
+        return testResult  
+    except  :
+        testResult == 'failed'
+        print ('test result is : ' ,testResult)
+        dataForLog = {testId : {'logs' : logger , 'test result' : testResult }}
+        oyf.orderedYaml_append(logfilepath , dataForLog)
+        oyf.orderedYaml_append(logfilepathFailed , dataForLog)
+
+
+        return testResult 
+
+def delay(varlist):
+    try:
+        logger = []
+        logger.append(timestamp() +' delay start the command is <<'+ str (varlist) + '>>'  )
+        print (timestamp() +' delay start the command is <<'+ str( varlist) + '>>')
+
+        testResult = 'pass'
+        parameteres = varlist
+        testType = parameteres.pop(0)
+        toPage = ""
+        id = parameteres.pop()
+        logfilepath = parameteres.pop()
+        testId = id  + ' --- ' + timestamp()+ ' *** '  + 'test type-->> ' + testType + ' : ' + toPage
+    
+        #time.sleep(int (parameteres[0]))
+
+        for i in range(1,int (parameteres[0])):
+            for ch in [ ' .\  ' , ' .|  ' , ' ./  ' , ' .-- '] :
+                    print(ch , end = '\r')
+                    time.sleep(0.2455)
+            
+
+        logger.append(timestamp() +' delay end the command is <<'+ str (varlist) + '>>'  )
+        print (timestamp() +' delay end the command is <<'+ str( varlist) + '>>')
+        dataForLog = {testId : {'logs' : logger}}
+        oyf.orderedYaml_append(logfilepath , dataForLog)
+        return testResult  
+    except  :
+        logger.append(timestamp() +' delay end the command is <<'+ str (varlist) + '>>'  )
+        print (timestamp() +' delay end the command is <<'+ str( varlist) + '>>')
+        dataForLog = {testId : {'logs' : logger}}
+        oyf.orderedYaml_append(logfilepath , dataForLog)
+        return testResult          
+
 
 
 
@@ -609,13 +756,11 @@ this program will log in into ez-edge automatically to test serial port
         exit()
 
     
-
-    
-
     theLogFile = loggerPath + 'serialPortTest_'+ timestamp() +'.yaml'
     
     for script in testScripts:
             par = []
+            
             for pa in str (testScripts[script]).split(';'):
                 par.append(pa.strip())
             par.append(theLogFile)
@@ -626,66 +771,3 @@ this program will log in into ez-edge automatically to test serial port
 
             eval(par[0])(par)
          
-         
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-    # to find out session of serial connection, if it was logged in initially     
-    #initialCurrentPage = gotoPageBackward('anywhere' , 'exit' , '')
-
-
-    #login to ez-edge
-    #serialLogin()
-
-
-
-    ''''
-    theLogFile = loggerPath + 'serialPortTest_'+ timestamp() +'.yaml'
-    varlist = (sUser + 'dd',sPass,'login',theLogFile)
-    serialLoginTest(varlist)
-    varlist = (sUser+'dd',sPass,'badlogin',theLogFile)
-    serialLoginTest(varlist)
-    varlist = (sUser +'dd',sPass,'badlogin',theLogFile)
-    serialLoginTest(varlist)
-    varlist = (sUser +'dd' ,sPass + 'dd','badlogin',theLogFile)
-    serialLoginTest(varlist)
-    varlist = [sUser +'dd',sPass,'badlogin',theLogFile]
-    serialLoginTest(varlist)
-    testScriptLoader(scriptFile)
-  
-    while 1 :
-           li1 = ser.readline()
-           if li1 == b'':
-               input1 = input('>> ') 
-               ser.write(input1.encode('ascii' , 'replace'))
-               rr = ser.read(1)
-               time.sleep(0.15)
-               ser.write(b'\r')
-           else :
-               li2 = ser.readline()
-               unColorString1 = nonAnsiString(li1.decode())
-               nnn = ['1 -' , '2 -' , '3 -' , '4 -' , '5 -' , '6 -', '7 -' , '8 -']
-               for nn in nnn: unColorString1 = unColorString1.replace( nn , ' \n' + nn )
-               if li2 == b'' :
-                    input1 = input(unColorString1 + ' >>') 
-                    ser.write(input1.encode('ascii' , 'replace'))
-                    rr = ser.read(1)
-                    time.sleep(0.15)
-                    ser.write(b'\r')
-               else:
-                   unColorString2 = nonAnsiString(li2.decode())
-                   for nn in nnn: unColorString2 = unColorString2.replace( nn , ' \n' + nn )            
-                   print(unColorString1)
-                   print(unColorString2)
-
-    ser.close() '''

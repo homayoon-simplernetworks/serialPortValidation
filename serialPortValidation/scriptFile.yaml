@@ -1,34 +1,78 @@
 
 #name of test : testType ; param1 ; param 2 ... (Note: this name should be unique)
 # testType should be: (for new test please add them in serialConfigurationTest.ymal)
-#		serialLoginTest : user ; pass ; login test type :(login , badlogin , wait)
-#		configTest ; (one of below options:) 
-#					netConfig : ip ; mask ; gateway ; confirmation
-#					sysconfig : 1 , 1 . Y/N
-#					timeConfig : 2015-10-12 ; 12:10:09 ; Y/N
-#					currentAlarms ; enter
-#					reset ; Y/N
-#					changePass ; ez-edge#2 ; ez-edge#1 ; ez-edge#1 ; Y/N/error
+#        serialLoginTest : user ; pass ; login test type :(login , badlogin , wait)
+#        configTest ; (one of below options:) 
+#                    netConfig : ip ; mask ; gateway ; confirmation
+#                    sysconfig : 1 , 1 . Y/N
+#                    timeConfig : 2015-10-12 ; 12:10:09 ; Y/N/error
+#                    currentAlarms ; enter
+#                    reset ; Y/N
+#                    changePass ; ez-edge#2 ; ez-edge#1 ; ez-edge#1 ; Y/N/error
+#
+# in case of using pass of day (you need to change variables files )
+#
+#
+#
+#
+#        autoLogout ; netConfig (one of configTest pages) ; 901 ; error
 
-#serialLoginTest1 : serialLoginTest ; admin ; ez-edge#1 ; login
-#serialLoginTest2 : serialLoginTest ; admin ; ez-edge#1; badlogin
-#serialLoginTest3 : serialLoginTest ; admin ; ez-edge#111 ; wait
+# Note: for backspace put \x08
+# to perform delay use  delay : 10 s 
+delay0 : delay ; 10
+loginSimple1 : serialLoginTest ; admin ; ez-edge#1 ; login
+loginSimple2 : serialLoginTest ; adma\x08in ; ez-edge#1 ; login
 
-#configTest1 : configTest ; netConfig ; 192.168.3.254 ; 255.255.255.0 ; 192.168.3.1 ; N
-#configTest2 : configTest ; netConfig ; 192.168.3.433 ; 255.255.255.0 ; 192.168.3.1 ; N
-#configTest3 : configTest ; netConfig ; 192.168.3.254 ; 255.255.433.0 ; 192.168.3.1 ; y
+badLogin1 : serialLoginTest ; adminn ; ez-edge#1; badlogin
+badLogin2 : serialLoginTest ; admin ; ez-edge#2; badlogin
 
-#configTest4 : configTest ; sysconfig ; 1 ; 2 ; N
-#configTest5 : configTest ; sysconfig ; 1 ; 1 ; N
+badLoginBlock1 : serialLoginTest ; admin ; ez-edge#111 ; wait
 
-#configTest6 : configTest ; netConfig ; 192.168.3.254 ; 255.255.255.0 ; 192.168.3.1 ; y
+alarm1 : configTest ; currentAlarms ; enter
 
-#configTest7 : configTest ; timeConfig ; 2015-10-12 ; 12:10:09 ; N
 
-#configTest8 : configTest ; sysconfig ; enter ; enter ; N
-#configTest9 : configTest ; currentAlarms ; enter
-#configTest10 : configTest ; reset ; N
-configTest11 : configTest ; changePass ; ez-edge#1 ; ez-edge#1 ; ez-edge#1 ; N
-configTest12 : configTest ; changePass ; ez-edge#2 ; ez-edge#1 ; ez-edge#1 ; error
-configTest13 : configTest ; changePass ; ez-edge#1 ; ez-edge#1 ; ez-edge#1 ; error
-configTest14 : configTest ; changePass ; ez-edge#1 ; ez-edge#1 ; ez-edge#1 ; N
+changePassInvalidNew1 : configTest ; changePass ; ez-edge#1 ; ez-edg ; ez-edg ; error
+changePassInvalidcurent1 : configTest ; changePass ; eb\x08z-edge#1 ; ez-edge#1 ; ez-edge#1 ; error
+changePassDifferentNew1 : configTest ; changePass ; ez-edge#1 ; ezdge#3 ; ezge#2 ; error
+changePassEnter1 : configTest ; changePass ; enter ; enter ; enter ; n
+changePass1 : configTest ; changePass ; ez-edge#1 ; ez-edge#2 ; ez-edge#2 ; n
+changePass2 : configTest ; changePass ; ez-edge#1 ; ez-edge#2 ; ez-edge#2 ; N
+changePass3 : configTest ; changePass ; ez-edge#1 ; ez-edge#2 ; ez-edge#2 ; Y
+
+delay1 : delay ; 10
+
+badLogin3 : serialLoginTest ; admin ; ez-edge#1 ; badlogin
+
+loginSimple3 : serialLoginTest ; admin ; ez-edge#2 ; login
+
+changePass4 : configTest ; changePass ; ez-edge#2 ; ez-edge#1 ; ez-edge#1 ; Y
+
+delay2 : delay ; 10
+
+resetTest1 : configTest ; reset ; N
+resetTest2 : configTest ; reset ; Y
+
+delay3 : delay ; 60
+
+configTest4 : configTest ; sysconfig ; 1 ; 2 ; N
+configTest4 : configTest ; sysconfig ; 1 ; 23 ; N
+configTest5 : configTest ; sysconfig ; 1 ; 1 ; Y
+
+delay4 : delay ; 60
+
+
+netConfig1 : configTest ; netConfig ; 192.168.3.115 ; 255.255.255.0 ; 192.168.3.1 ; N
+netConfig2 : configTest ; netConfig ; 192.168.3.433 ; 255.255.255.0 ; 192.168.3.1 ; N
+netConfig3 : configTest ; netConfig ; 192.168.3.115 ; 255.255.430.0 ; 192.168.3.1 ; N
+netConfig4 : configTest ; netConfig ; 192.168.3.115 ; 255.255.255.0 ; 192.168.3.1 ; Y
+
+delay5 : delay ; 60
+
+timeConfig1 : configTest ; timeConfig ; 2015-140-12 ; 12:150:09 ; N
+#timeConfig2 : configTest ; timeConfig ; 2015-140-12 ; 12:150:09 ; error    #needs ntp server to be available
+timeConfig3 : configTest ; timeConfig ; enter ; enter ; N
+timeConfig4 : configTest ; timeConfig ; 2015-10-20 ; 14:20:30 ; Y
+
+
+autologout1 : autoLogout ; netConfig ; 10 ; error
+autologout2 : autoLogout ; netConfig ; 901 ; pass

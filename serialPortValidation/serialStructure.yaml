@@ -45,3 +45,15 @@ unknown :
 booting : 
   idf: 'Simpler Networks EZ-EDGE Boot' 
   returnCode : 1005
+debugOption : 
+  idf: 'EZ-EDGE Local Craft Interface - Debug Options' 
+  returnCode : 4
+syslogConfig : 
+  idf: 'EZ-EDGE Local Craft Interface - Syslog Configuration' 
+  returnCode : 408
+operationMode : 
+  idf: 'EZ-EDGE Local Craft Interface - System Operation Mode' 
+  returnCode : 409
+resetSecurity : 
+  idf: 'EZ-EDGE Local Craft Interface - Reset Security to Factory Default' 
+  returnCode : 410

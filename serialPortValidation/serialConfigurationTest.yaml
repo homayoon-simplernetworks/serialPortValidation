@@ -19,6 +19,7 @@
               'Y' : 'Changes applied successfully. Press any key to continue'
               expectedPrompt : 'Please confirm you want to proceed with the new configuration [N]:'
               'enter' : 'EZ-EDGE Local Craft Interface - Configuration Parameters'
+              wrongValue : '333.128.3.3'
     2 : 
         expectedPage : 'netConfig'
         PageOptions : '0'
@@ -40,6 +41,7 @@
               'Y' : 'Changes applied successfully. Press any key to continue'
               expectedPrompt : 'Please confirm you want to proceed with the new configuration [N]:'
               'enter' : 'EZ-EDGE Local Craft Interface - Configuration Parameters'
+              wrongValue : '333.128.3.3'
     3 : 
         expectedPage : 'timeConfig'
         PageOptions : '0'
@@ -57,6 +59,7 @@
               'Y' : 'Changes applied successfully. Press any key to continue'
               expectedPrompt : 'Please confirm you want to proceed with the new configuration [N]:'
               'enter' : 'EZ-EDGE Local Craft Interface - Configuration Parameters'
+              wrongValue : 'error: setting time is not allowed when NTP server is active'
 2 :
   expectedPage  : 'currentAlarms'
   PageOptions : '0'
@@ -89,7 +92,7 @@
     step3 :
       defaultValue : 'ez-edge#1'
       expectedPrompt : 'Confirm new Local Craft Interface password'
-      wrongValue : 'Error: New and confirm password are different'
+      wrongValue : 'Error: New password invalid format'
     step4 :
       defaultValue : 'N'
       expectedPrompt : 'Please confirm you want to proceed with the new configuration [N]'

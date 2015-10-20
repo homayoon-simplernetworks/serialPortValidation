@@ -7,9 +7,13 @@ timeout : 0.5                                            #the best one is 0.5
 
 serialUser : 'admin'
 serialPass : 'ez-edge#1'
+#serialPass : 'pass of day'								#please also change "fserconfStrc" to serialConfigurationTestPassOfDay.yaml
 
 
 fserconfStrc : 'serialConfigurationTest.yaml'            #this file will use as serial port configuration test references'
+#fserconfStrc : 'serialConfigurationTestPassOfDay.yaml'            #this file will use as serial port configuration test references when pass of day is provided'
+
+
 fStructure : 'serialStructure.yaml'                      #load ez-edge LCI structure
 loggerPath: 'c:\\logs\\LCI_logs\\'                       #all logs will save there
 scriptFile: 'scriptFile.yaml'
