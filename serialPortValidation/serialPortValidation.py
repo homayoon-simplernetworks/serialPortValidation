@@ -678,7 +678,7 @@ this program will log in into ez-edge automatically to test serial port
 
 ''')
 
-    #if not input('please confirm you want run the test[y]: ') == 'y' : exit()
+    if not input('please confirm you want to run the test[y]: ') == 'y' : exit()
 
 
     #Parameters and variables
