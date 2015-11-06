@@ -32,6 +32,8 @@
     <Compile Include="yld.py" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="readme_serial.docx" />
+    <Content Include="readme_serial.pdf" />
     <Content Include="scriptFile.yaml" />
     <Content Include="serialConfigurationTestPassOfDay.yaml" />
     <Content Include="serialConfigurationTest2.yaml" />
